@@ -318,3 +318,26 @@ footer { padding: 70px 40px 25px; background: var(--dark); color: var(--white); 
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
 }
+
+/* PixTech · páginas nuevas (mismo diseño: tokens --ink/--blue/--paper) */
+.catalog-filters { display: flex; gap: 10px; align-items: center; margin-bottom: 28px; flex-wrap: wrap; }
+.catalog-filters input, .catalog-filters select {
+  height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px;
+  background: var(--white); font-size: 13px; outline: none;
+}
+.catalog-filters input:focus, .catalog-filters select:focus { border-color: var(--blue); }
+.catalog-filters span { color: var(--ink-soft); font-size: 12px; }
+.catalog-filters button { background: transparent; text-decoration: underline; font-size: 12px; }
+.detail-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 28px; align-items: start; }
+.detail-layout > img { width: 100%; border-radius: var(--radius-md); background: #ececea; }
+.detail-layout h1 { margin: 10px 0; font: 700 clamp(28px, 3.4vw, 44px)/1.1 "Manrope"; letter-spacing: -.04em; }
+.checkout-layout { display: grid; grid-template-columns: 1.2fr .8fr; gap: 24px; align-items: start; }
+.checkout-form { display: grid; gap: 10px; margin-top: 20px; max-width: 520px; }
+.checkout-form input, .checkout-form select {
+  height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px;
+  background: var(--white); font-size: 13px;
+}
+.checkout-form p[role="alert"] { color: #b42318; font-size: 12px; }
+@media (max-width: 900px) {
+  .detail-layout, .checkout-layout { grid-template-columns: 1fr; }
+}
