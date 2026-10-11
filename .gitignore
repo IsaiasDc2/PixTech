@@ -19,5 +19,5 @@ logs/
 # beside it.
 /.plugins/
 /.opencode-skills/
-\
-__pycache__/\
+
+__pycache__/
