@@ -26,9 +26,28 @@ def tienda() -> dict:
 
 
 def obtener_comprobante(orden_id: str) -> dict | None:
+    # Esquema vigente 006_checkout_servidor (006): comprobantes guarda solo
+    # totales en centavos; las líneas se leen de orden_items + productos.
     filas = _sb("comprobantes",
-                query=f"?orden_id=eq.{orden_id}&select=*,ordenes(nombre,email,documento,direccion,ciudad,provincia,codigo_postal,envio,subtotal,costo_envio,total,created_at)")
-    return filas[0] if filas else None
+                query=(f"?orden_id=eq.{orden_id}&select=*,ordenes(nombre,email,direccion,ciudad,"
+                       "codigo_postal,envio,subtotal_centavos,costo_envio_centavos,total_centavos,"
+                       "acceso_token,created_at)"))
+    if not filas:
+        return None
+    c = filas[0]
+    try:
+        items = _sb("orden_items",
+                    query=f"?orden_id=eq.{orden_id}&select=cantidad,precio,productos(nombre)")
+    except Exception:
+        items = []
+    lineas = []
+    for it in items or []:
+        prod = it.get("productos") or {}
+        nombre = prod.get("nombre", "") if isinstance(prod, dict) else ""
+        lineas.append({"cantidad": it.get("cantidad", 1), "nombre": nombre,
+                       "precio_unitario": int(it.get("precio") or 0)})
+    c["items_snapshot"] = lineas
+    return c
 
 
 def _pdf_minimo(lineas: list[str]) -> bytes:
@@ -60,31 +79,34 @@ def _pdf_minimo(lineas: list[str]) -> bytes:
 def comprobante_pdf(c: dict) -> bytes:
     t = tienda()
     o = c.get("ordenes", {}) if isinstance(c.get("ordenes"), dict) else {}
-    fecha = c.get("emitido_en") or c.get("created_at") or ""
+    fecha = c.get("emitida_at") or c.get("created_at") or ""
     try:
         fecha = datetime.fromisoformat(fecha).astimezone(TZ).strftime("%d/%m/%Y %H:%M")
     except Exception:
         pass
+    subtotal = int(o.get("subtotal_centavos", 0)) / 100
+    envio = int(o.get("costo_envio_centavos", 0)) / 100
+    total = int(o.get("total_centavos", 0)) / 100
     lineas = [
-        f"{t['nombre'] or 'HefestoTech'}",
+        f"{t['nombre'] or 'PixTech'}",
         f"CUIT: {t['cuit'] or '-'}  |  {t['direccion'] or ''}",
         f"{t['email'] or ''}  {t['telefono'] or ''}",
         "=" * 58,
-        f"COMPROBANTE {c.get('numero', '')}",
+        f"COMPROBANTE {str(c.get('id', ''))[:8].upper()}",
         f"Fecha (Bs.As.): {fecha}",
-        f"Cliente: {o.get('nombre', '')}  Doc: {o.get('documento', '')}",
-        f"{o.get('direccion', '')}, {o.get('ciudad', '')} ({o.get('provincia', '')}) CP {o.get('codigo_postal', '')}",
+        f"Cliente: {o.get('nombre', '')}",
+        f"{o.get('direccion', '')}, {o.get('ciudad', '')} CP {o.get('codigo_postal', '')}",
         "-" * 58,
     ]
     for it in c.get("items_snapshot", []) or []:
         lineas.append(f"{it.get('cantidad',1)}x {str(it.get('nombre',''))[:36]:36} ${int(it.get('precio_unitario',0)):>9,}".replace(",", "."))
     lineas += [
         "-" * 58,
-        f"Subtotal: ${int(o.get('subtotal', 0)):>,}".replace(",", "."),
-        f"Envio ({o.get('envio','')}): ${int(o.get('costo_envio', 0)):>,}".replace(",", "."),
-        f"TOTAL: ${int(o.get('total', 0)):>,}".replace(",", "."),
+        f"Subtotal: ${subtotal:>,.0f}".replace(",", "."),
+        f"Envio ({o.get('envio','')}): ${envio:>,.0f}".replace(",", "."),
+        f"TOTAL: ${total:>,.0f}".replace(",", "."),
         "=" * 58,
         LEYENDA,
-        f"Verificacion: {_env('FRONTEND_URL', '')}/pedido/{c.get('orden_id','')}?token={c.get('token_verificacion','')}",
+        f"Verificacion: {_env('FRONTEND_URL', '')}/pedido/{c.get('orden_id','')}?token={o.get('acceso_token','')}",
     ]
     return _pdf_minimo(lineas)

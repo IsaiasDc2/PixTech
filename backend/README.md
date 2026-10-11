@@ -52,9 +52,12 @@ uvicorn main:app --reload --port 8000
 
 ## Migraciones Supabase
 
-Aplicar en orden las de `hefestotech/supabase/migrations/`:
-`001_productos` → `002_ordenes` → `003_negocio` → `005_admin_infra` → `006_checkout_servidor` (+ specs).
-La `004_checkout_real` queda legacy.
+Aplicar en orden las de `supabase/migrations` (ver `supabase/README.md`):
+`001` → `002` → `003` → `004_admin_roles` → `005_admin_infra` → `005_product_specs`
+→ `006_checkout_servidor` → `006_specs_iniciales` → `007_nuevos_productos` → `007_test_admin`.
+**No aplicar `004_checkout_real.sql`** (legacy: sus tablas `eventos_webhook`/`comprobantes`
+son incompatibles con lo que escribe `checkout_api.py`; 006 lo reemplaza).
+`comprobantes.py` ya está adaptado al esquema 006 vigente.
 
 ## Seguridad
 
