@@ -1,0 +1,10 @@
+{
+  "description": "Pixtech offers a premium ecommerce experience for tech enthusiasts, allowing users to explore, compare, and purchase high-quality hardware and gaming products.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
