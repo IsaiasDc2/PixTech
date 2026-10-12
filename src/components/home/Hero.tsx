@@ -4,7 +4,7 @@ import Icon from "@/components/ui/Icon";
 export default function Hero() {
   const go = (sel: string) => document.querySelector(sel)?.scrollIntoView({ behavior: "smooth" });
   return <section className="hero">
-    <img className="hero-bg" src="https://images.unsplash.com/photo-1769353785928-e6ccc4b9e635?auto=format&fit=crop&w=1800&q=90" alt="Componentes de una PC gaming iluminados en azul" />
+    <img className="hero-bg" src="https://ewqwmzwtrsjlrrnrotcm.supabase.co/storage/v1/object/public/productos/BANNER%202.webp" alt="Gamer con auriculares frente a su setup" />
     <div className="hero-shade" />
     <div className="hero-copy">
       <span className="hero-label">NUEVA GENERACIÓN · SERIE RTX 40</span>

@@ -14,6 +14,7 @@ En un proyecto **nuevo y vacío**:
 8. `006_specs_iniciales.sql` — specs inferidas (`verified=false`, idempotente por `ON CONFLICT`)
 9. `007_nuevos_productos.sql` — productos + specs adicionales
 10. `007_test_admin.sql` — solo agrega columnas `is_test_user` / `expires_at` (sin datos de prueba)
+11. `008_indices.sql` — compuesto `productos(deleted_at, nombre)` para el listado admin (filtro + orden + paginación sin Sort)
 
 ## ⚠️ NO aplicar `004_checkout_real.sql`
 
